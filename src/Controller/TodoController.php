@@ -8,10 +8,10 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use function mysql_xdevapi\getSession;
-
+#[Route("/todo")]
 class TodoController extends AbstractController
 {
-    #[Route('/todo', name: '_todo')]
+    #[Route('', name: '_todo')]
     public function index(Request $request): Response
     {
         // afficher notre tableau de ToDo
@@ -30,7 +30,7 @@ class TodoController extends AbstractController
             'controller_name' => 'TodoController',
         ]);
     }
-    #[Route('/todo/add/{name}/{content}', name: '_todo.add')]
+    #[Route('/add/{name}/{content}', name: '_todo.add')]
     public function addTodo(Request $request, $name, $content): RedirectResponse
     {
         // verifier si j'ai une session avec un todo
@@ -52,7 +52,7 @@ class TodoController extends AbstractController
         return $this->redirectToRoute('_todo');
     }
 
-    #[Route('/todo/update/{name}/{content}', name: '_todo.update')]
+    #[Route('/update/{name}/{content}', name: '_todo.update')]
     public function updateTodo(Request $request, $name, $content): RedirectResponse
     {
         // verifier si j'ai une session avec un todo
@@ -74,7 +74,7 @@ class TodoController extends AbstractController
         return $this->redirectToRoute('_todo');
     }
 
-    #[Route('/todo/delete/{name?}', name: '_todo.delete')]
+    #[Route('/delete/{name?}', name: '_todo.delete')]
     public function deleteTodo(Request $request, $name): RedirectResponse
     {
         $session = $request->getSession();

@@ -1,5 +1,11 @@
-{% extends 'base.html.twig' %}
+{% extends 'shared/template.html.twig' %}
 {% block body %}
-<h1>TEST</h1>
-
+    <div class="container">
+        <h1 class="text-muted">
+            <span class="small">
+                 {{ firstname | capitalize }} {{  name | capitalize }} vient d'entrer sur la Terre du Milieu  🙃!
+            </span>
+        </h1>
+        <img src="{{ asset('assets/images/') ~ path | defaultImage  }}" alt="mangas">
+    </div>
 {% endblock %}

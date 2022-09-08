@@ -1,0 +1,24 @@
+{% extends 'shared/template.html.twig' %}
+
+{% block title %}Hello ArrayController!{% endblock %}
+
+{% block body %}
+<div class="container">
+    <h1 class="text-muted">
+        Array
+    </h1>
+
+    <table class="table">
+        {% for grade in grades %}
+            <tr>
+                <td>{{ grade }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+    <div class="alert alert-info">
+        <p>Nombre de notes : {{  grades | length }}</p>
+        <p>Note minimale : {{  min(grades) }}</p>
+        <p>Note maximale : {{  max(grades) }}</p>
+    </div>
+</div>
+{% endblock %}
