@@ -39,20 +39,19 @@ class PersonRepository extends ServiceEntityRepository
         }
     }
 
-//    /**
-//     * @return Person[] Returns an array of Person objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('p')
-//            ->andWhere('p.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('p.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+    /**
+     * @return Person[] Returns an array of Person objects
+     */
+    public function findPersonByIntervalAge($min, $max): array
+    {
+        return $this->createQueryBuilder('p')
+            ->andWhere('p.age > :min and p.age < :max')
+            ->setParameters(['min'=> $min, 'max' => $max])
+            ->orderBy('p.id', 'ASC')
+            ->getQuery()
+            ->getResult()
+        ;
+    }
 
 //    public function findOneBySomeField($value): ?Person
 //    {

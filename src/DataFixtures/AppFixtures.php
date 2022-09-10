@@ -14,7 +14,7 @@ class AppFixtures extends Fixture
     {
         $faker = \Faker\Factory::create('en_EN');
 
-        for ($i = 0; $i < 5; $i++) {
+        for ($i = 0; $i < 20; $i++) {
             $person = new Person();
             $person->setName($faker->name())
                 ->setFirstname($faker->firstName())

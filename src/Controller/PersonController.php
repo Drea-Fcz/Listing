@@ -13,18 +13,22 @@ use Symfony\Component\Routing\Annotation\Route;
 #[Route('person')]
 class PersonController extends AbstractController
 {
-    private $em;
+    private EntityManagerInterface $_em;
     private PersonRepository $repository;
 
     public function __construct(EntityManagerInterface $em,
                                 PersonRepository $repository
     )
     {
-        $this->em = $em;
+        $this->_em = $em;
         $this->repository = $repository;
     }
 
 //    #[Route('/add', name: '_person.add')]
+
+    /**
+     * @return void
+     */
     public function addPerson()
     {
         $person =  new Person();
@@ -33,11 +37,14 @@ class PersonController extends AbstractController
             ->setAge(38)
             ->setJob('Developer');
 
-        $this->em->persist($person);
-        $this->em->flush();
+        $this->_em->persist($person);
+        $this->_em->flush();
     }
 
 
+    /**
+     * @return Response
+     */
     #[Route('', name: '_person.list')]
     public function displayPersons(): Response
     {
@@ -48,6 +55,27 @@ class PersonController extends AbstractController
         ]);
     }
 
+    /**
+     * @param $page
+     * @param $nbr
+     * @return Response
+     */
+    #[Route('/all/{ageMin?22}/{ageMax?33}', name: '_person.age')]
+    public function displayAllPersonsByAges($ageMin, $ageMax): Response
+    {
+        $persons = $this->repository->findPersonByIntervalAge($ageMin,$ageMax);
+
+        return $this->render('person/detail.html.twig', [
+            'persons' => $persons,
+            'isPaginated' => true
+        ]);
+    }
+
+    /**
+     * @param $page
+     * @param $nbr
+     * @return Response
+     */
     #[Route('/all/{page?1}/{nbr?12}', name: '_person.all')]
     public function displayAllPersons($page, $nbr): Response
     {
@@ -59,6 +87,10 @@ class PersonController extends AbstractController
         ]);
     }
 
+    /**
+     * @param $id
+     * @return Response
+     */
     #[Route('/detail/{id}', name: '_person.detail')]
     public function displayPerson($id)
     {
@@ -72,12 +104,16 @@ class PersonController extends AbstractController
         ]);
     }
 
+    /**
+     * @param Person|null $person
+     * @return RedirectResponse
+     */
     #[Route('/delete/{id}', name: '_person.delete')]
     public function deletePerson(Person $person = null): RedirectResponse
     {
         if ($person) {
-            $this->em->remove($person);
-            $this->em->flush();
+            $this->_em->remove($person);
+            $this->_em->flush();
 
             $this->addFlash('success', "La personne a bien été supprimée");
 
@@ -90,6 +126,13 @@ class PersonController extends AbstractController
     }
 
 
+    /**
+     * @param Person|null $person
+     * @param $name
+     * @param $firstname
+     * @param $age
+     * @return RedirectResponse
+     */
     #[Route('/update/{id}/{name}/{firstname}/{age}', name: '_person.update')]
     public function updatePerson(Person $person = null, $name, $firstname, $age): RedirectResponse
     {
@@ -100,8 +143,8 @@ class PersonController extends AbstractController
                 ->setFirstname($firstname)
                 ->setAge($age);
 
-            $this->em->persist($person);
-            $this->em->flush();
+            $this->_em->persist($person);
+            $this->_em->flush();
 
             // flash message for the success
             $this->addFlash('success', "La personne a bien été modifiée");
@@ -113,4 +156,6 @@ class PersonController extends AbstractController
         // If you redirect the route don't forget the response
         return  $this->redirectToRoute('_person.all');
     }
+
+
 }
