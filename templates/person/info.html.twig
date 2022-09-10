@@ -1,0 +1,13 @@
+{% extends 'shared/template.html.twig' %}
+
+{% block body %}
+        {% if person %}
+                <div class="alert alert-success">
+                        {{ person.firstname }} {{ person.name }} is {{ person.age }} years old and is a {{ person.job }}
+                </div>
+        {% endif %}
+{% endblock %}
+{% block title %}
+
+{% endblock %}
+

@@ -1,0 +1,48 @@
+{% extends 'shared/template.html.twig' %}
+
+{% block body %}
+    <div class="row">
+        {% for person in persons %}
+            <div class="card me-1 mb-3" style="width: 18rem;">
+                <div class="card-body">
+                    <h5 class="card-title">{{ person.id }}</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">{{ person.firstname }} {{ person.name }}</h6>
+                    <p class="card-text">
+                        {{ person.firstname }} is {{ person.age }} years old and is a {{ person.job }}
+                    </p>
+                    <a href="#" class="card-link">Todo</a>
+                    <a href="{{ path('_person.delete', {id: person.id}) }}" class="card-link">Delete</a>
+                    <a href="{{ path('_person.update', {id: person.id, name: 'test', firstname: 'test 1', age: 34}) }}" class="card-link">Update</a>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    {% if isPaginated %}
+        <nav aria-label="Page navigation example">
+            <ul class="pagination">
+                <li class="page-item">
+                    <a class="page-link" href="#" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                        <span class="sr-only">Previous</span>
+                    </a>
+                </li>
+                <li class="page-item"><a class="page-link" href="#">1</a></li>
+                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                <li class="page-item">
+                    <a class="page-link" href="#" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                        <span class="sr-only">Next</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+    {% endif %}
+{% endblock %}
+
+{% block title %}
+
+{% endblock %}
+
