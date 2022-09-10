@@ -64,9 +64,11 @@ class PersonController extends AbstractController
     public function displayAllPersonsByAges($ageMin, $ageMax): Response
     {
         $persons = $this->repository->findPersonByIntervalAge($ageMin,$ageMax);
+        $stats = $this->repository->statPersonByIntervalAgeAndMoyen($ageMin,$ageMax);
 
         return $this->render('person/detail.html.twig', [
             'persons' => $persons,
+            'stat' => $stats,
             'isPaginated' => true
         ]);
     }

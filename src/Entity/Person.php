@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\PersonRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -23,8 +25,21 @@ class Person
     #[ORM\Column(type: Types::SMALLINT)]
     private ?int $age = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $job = null;
+    #[ORM\OneToOne(inversedBy: 'person', cascade: ['persist', 'remove'])]
+    private ?Profile $profile = null;
+
+    #[ORM\ManyToMany(targetEntity: Hobby::class, inversedBy: 'people')]
+    private Collection $hobbies;
+
+    #[ORM\OneToMany(mappedBy: 'person', targetEntity: Job::class)]
+    private Collection $job;
+
+
+    public function __construct()
+    {
+        $this->hobbies = new ArrayCollection();
+        $this->job = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -67,14 +82,68 @@ class Person
         return $this;
     }
 
-    public function getJob(): ?string
+    public function getProfile(): ?Profile
+    {
+        return $this->profile;
+    }
+
+    public function setProfile(?Profile $profile): self
+    {
+        $this->profile = $profile;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Hobby>
+     */
+    public function getHobbies(): Collection
+    {
+        return $this->hobbies;
+    }
+
+    public function addHobby(Hobby $hobby): self
+    {
+        if (!$this->hobbies->contains($hobby)) {
+            $this->hobbies->add($hobby);
+        }
+
+        return $this;
+    }
+
+    public function removeHobby(Hobby $hobby): self
+    {
+        $this->hobbies->removeElement($hobby);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Job>
+     */
+    public function getJob(): Collection
     {
         return $this->job;
     }
 
-    public function setJob(string $job): self
+    public function addJob(Job $job): self
     {
-        $this->job = $job;
+        if (!$this->job->contains($job)) {
+            $this->job->add($job);
+            $job->setPerson($this);
+        }
+
+        return $this;
+    }
+
+    public function removeJob(Job $job): self
+    {
+        if ($this->job->removeElement($job)) {
+            // set the owning side to null (unless already changed)
+            if ($job->getPerson() === $this) {
+                $job->setPerson(null);
+            }
+        }
 
         return $this;
     }
