@@ -18,8 +18,7 @@ class AppFixtures extends Fixture
             $person = new Person();
             $person->setName($faker->name())
                 ->setFirstname($faker->firstName())
-                ->setAge(rand(20, 50))
-                ->setJob($faker->jobTitle());
+                ->setAge(rand(20, 50));
 
             $manager->persist($person);
         }

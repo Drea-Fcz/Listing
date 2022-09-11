@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Person;
 use App\Repository\PersonRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Mapping\HasLifecycleCallbacks;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -52,7 +53,8 @@ class PersonController extends AbstractController
 
         return $this->render('person/detail.html.twig', [
             'persons' => $persons,
-            'isPaginated' => true
+            'isPaginated' => true,
+            'isStat' => false
         ]);
     }
 
@@ -70,7 +72,8 @@ class PersonController extends AbstractController
         return $this->render('person/detail.html.twig', [
             'persons' => $persons,
             'stat' => $stats,
-            'isPaginated' => true
+            'isPaginated' => true,
+            'isStat' => true
         ]);
     }
 
