@@ -2,6 +2,8 @@
 
 namespace App\DataFixtures;
 
+use App\Entity\Hobby;
+use App\Entity\Job;
 use App\Entity\Person;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
@@ -21,6 +23,21 @@ class AppFixtures extends Fixture
                 ->setAge(rand(20, 50));
 
             $manager->persist($person);
+        }
+
+        for ($i = 0; $i < 10; $i++) {
+            $job = new Job();
+            $job->setDesignation($faker->jobTitle());
+
+            $manager->persist($job);
+        }
+
+        $hobbies = ['Astrology', 'Acting', 'Music', 'Video Games', 'Hacking', 'Running', 'Climbing'];
+        for ($i = 0; $i < count($hobbies) - 1; $i++) {
+            $hobby = new Hobby();
+            $hobby->setDesignation($faker->randomElement($hobbies));
+
+            $manager->persist($hobby);
         }
 
         // $product = new Product();
