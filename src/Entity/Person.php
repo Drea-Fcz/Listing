@@ -29,6 +29,7 @@ class Person
     private ?Profile $profile = null;
 
     #[ORM\ManyToMany(targetEntity: Hobby::class, inversedBy: 'people')]
+    #[ORM\JoinTable(name: "person_hobbies")]
     private Collection $hobbies;
 
     #[ORM\OneToMany(mappedBy: 'person', targetEntity: Job::class)]

@@ -49,6 +49,7 @@ class PersonController extends AbstractController
     public function displayPersons(): Response
     {
         $persons = $this->repository->findAll();
+
         return $this->render('person/detail.html.twig', [
             'persons' => $persons,
             'isPaginated' => true

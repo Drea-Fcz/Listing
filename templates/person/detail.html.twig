@@ -8,7 +8,7 @@
                     <h5 class="card-title">{{ person.id }}</h5>
                     <h6 class="card-subtitle mb-2 text-muted">{{ person.firstname }} {{ person.name }}</h6>
                     <p class="card-text">
-                        {{ person.firstname }} is {{ person.age }} years old and is a {{ person.job }}
+                        {{ person.firstname }} is {{ person.age }} years old
                     </p>
                     <a href="#" class="card-link">Todo</a>
                     <a href="{{ path('_person.delete', {id: person.id}) }}" class="card-link">Delete</a>

@@ -18,7 +18,7 @@ class Hobby
     #[ORM\Column(length: 70)]
     private ?string $designation = null;
 
-    #[ORM\ManyToMany(targetEntity: Person::class, mappedBy: 'hobbies')]
+    #[ORM\ManyToMany(targetEntity: Person::class, mappedBy: 'hobbies', cascade: ['all'], orphanRemoval: true)]
     private Collection $people;
 
     public function __construct()
