@@ -5,8 +5,8 @@ namespace App\Controller;
 use App\Entity\Person;
 use App\Form\PersonType;
 use App\Repository\PersonRepository;
+use App\Service\UploaderService;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Mapping\HasLifecycleCallbacks;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -22,7 +22,7 @@ class PersonController extends AbstractController
     private PersonRepository $repository;
 
     public function __construct(EntityManagerInterface $em,
-                                PersonRepository $repository
+                                PersonRepository $repository,
     )
     {
         $this->_em = $em;
@@ -58,7 +58,7 @@ class PersonController extends AbstractController
 */
 
     #[Route('/edit/{id?0}', name: '_person.edit')]
-    public function editPerson(Person $person = null, Request $request, SluggerInterface $slugger): Response
+    public function editPerson(Person $person = null, Request $request, UploaderService $uploader): Response
     {
         $new = false;
         // $person est l'image de notre formulaire
@@ -75,33 +75,12 @@ class PersonController extends AbstractController
         // est ce que le formulaire a été soumis
         if ($form->isSubmitted() && $form->isValid())
         {
-
             $imgFile = $form->get('image')->getData();
 
-            // this condition is needed because the 'brochure' field is not required
-            // so the PDF file must be processed only when a file is uploaded
             if ($imgFile) {
-                $originalFilename = pathinfo($imgFile->getClientOriginalName(), PATHINFO_FILENAME);
-                // this is needed to safely include the file name as part of the URL
-                $safeFilename = $slugger->slug($originalFilename);
-                $newFilename = $safeFilename.'-'.uniqid().'.'.$imgFile->guessExtension();
-
-                // Move the file to the directory where brochures are stored
-                try {
-                    $imgFile->move(
-                        $this->getParameter('images_directory'),
-                        $newFilename
-                    );
-                } catch (FileException $e) {
-                    // ... handle exception if something happens during file upload
-                }
-
-                // updates the 'brochureFilename' property to store the PDF file name
-                // instead of its contents
-                $person->setImg($newFilename);
+                $directoryFolder = $this->getParameter('images_directory');
+                $person->setImg($uploader->uploadFile($directoryFolder, $imgFile));
             }
-
-
 
             // si oui, on ajoute l'objet person dans la base de données
             $this->_em->persist($person);
