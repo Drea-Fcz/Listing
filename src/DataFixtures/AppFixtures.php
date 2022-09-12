@@ -5,6 +5,7 @@ namespace App\DataFixtures;
 use App\Entity\Hobby;
 use App\Entity\Job;
 use App\Entity\Person;
+use App\Entity\Profile;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 
@@ -40,8 +41,15 @@ class AppFixtures extends Fixture
             $manager->persist($hobby);
         }
 
-        // $product = new Product();
-        // $manager->persist($product);
+        $rs = ['Facebook', 'Twitter', 'Snapchat', 'Instagram', 'Reddit'];
+        for ($i = 0; $i < 5; $i++) {
+            $profile = new Profile();
+            $profile->setUrl($faker->url())
+                ->setRs($faker->randomElement($rs))
+            ;
+
+            $manager->persist($profile);
+        }
 
         $manager->flush();
     }

@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: PersonRepository::class)]
 #[ORM\HasLifecycleCallbacks]
@@ -21,12 +22,19 @@ class Person
     private ?int $id = null;
 
     #[ORM\Column(length: 100)]
+    #[Assert\NotBlank(message: "Veuillez entrer votre Prénom")]
+    #[Assert\Length(min: 3, max: 100,
+        minMessage: "Vous devez saisir 3 caractères minimum",
+        maxMessage: "Vous devez saisir 100 caractères maximum"
+    )]
     private ?string $firstname = null;
 
     #[ORM\Column(length: 100)]
+    #[Assert\NotBlank(message: "Veuillez entrer votre nom")]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::SMALLINT)]
+    #[Assert\Positive(message: "Veuillez enter une valeur positive")]
     private ?int $age = null;
 
     #[ORM\OneToOne(inversedBy: 'person', cascade: ['persist', 'remove'])]
@@ -35,8 +43,11 @@ class Person
     #[ORM\ManyToMany(targetEntity: Hobby::class, inversedBy: 'people')]
     private Collection $hobbies;
 
-    #[ORM\OneToMany(mappedBy: 'person', targetEntity: Job::class)]
+    #[ORM\OneToMany(mappedBy: 'person', targetEntity: Job::class, cascade: ['persist'])]
     private Collection $job;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $img = null;
 
 
 
@@ -149,6 +160,18 @@ class Person
                 $job->setPerson(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getImg(): ?string
+    {
+        return $this->img;
+    }
+
+    public function setImg(?string $img): self
+    {
+        $this->img = $img;
 
         return $this;
     }

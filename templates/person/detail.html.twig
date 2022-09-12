@@ -16,7 +16,7 @@
                     </div>
                     <a href="#" class="card-link">Todo</a>
                     <a href="{{ path('_person.delete', {id: person.id}) }}" class="card-link">Delete</a>
-                    <a href="{{ path('_person.update', {id: person.id, name: 'test', firstname: 'test 1', age: 34}) }}" class="card-link">Update</a>
+                    <a href="{{ path('_person.edit', {id: person.id}) }}" class="card-link">Update</a>
                 </div>
             </div>
         {% endfor %}

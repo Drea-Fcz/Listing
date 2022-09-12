@@ -3,13 +3,17 @@
 namespace App\Controller;
 
 use App\Entity\Person;
+use App\Form\PersonType;
 use App\Repository\PersonRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\HasLifecycleCallbacks;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\String\Slugger\SluggerInterface;
 
 #[Route('person')]
 class PersonController extends AbstractController
@@ -24,22 +28,94 @@ class PersonController extends AbstractController
         $this->_em = $em;
         $this->repository = $repository;
     }
-
-//    #[Route('/add', name: '_person.add')]
-
-    /**
-     * @return void
-     */
-    public function addPerson()
+/*
+    #[Route('/add', name: '_person.add')]
+    public function addPerson(Request $request): Response
     {
-        $person =  new Person();
-        $person->setName('Fcz')
-            ->setFirstname('Audrey')
-            ->setAge(38)
-            ->setJob('Developer');
+        $person = new Person();
+        // $person est l'image de notre formulaire
 
-        $this->_em->persist($person);
-        $this->_em->flush();
+        $personForm = $this->createForm(PersonType::class, $person);
+
+        // récupère l'objet request et extrait les informations saisies
+        $personForm->handleRequest($request);
+
+        // est ce que le formulaire a été soumis
+        if ($personForm->isSubmitted()) {
+            // si oui, on ajoute l'objet person dans la base de données
+            $this->_em->persist($person);
+            $this->_em->flush();
+            // Afficher un message de succès
+            $this->addFlash('Success', "La personne a bien été ajouté dans la liste");
+            // Rediriger vers la liste des personnes
+           return $this->redirectToRoute('_person.list');
+        } else {
+            return $this->render('person/add.html.twig', [
+                'form' => $personForm->createView()
+            ]);
+        }
+    }
+*/
+
+    #[Route('/edit/{id?0}', name: '_person.edit')]
+    public function editPerson(Person $person = null, Request $request, SluggerInterface $slugger): Response
+    {
+        $new = false;
+        // $person est l'image de notre formulaire
+        if (!$person) {
+            $new = true;
+            $person = new Person();
+        }
+
+        $form = $this->createForm(PersonType::class, $person);
+
+        // récupère l'objet request et extrait les informations saisies
+        $form->handleRequest($request);
+
+        // est ce que le formulaire a été soumis
+        if ($form->isSubmitted() && $form->isValid())
+        {
+
+            $imgFile = $form->get('image')->getData();
+
+            // this condition is needed because the 'brochure' field is not required
+            // so the PDF file must be processed only when a file is uploaded
+            if ($imgFile) {
+                $originalFilename = pathinfo($imgFile->getClientOriginalName(), PATHINFO_FILENAME);
+                // this is needed to safely include the file name as part of the URL
+                $safeFilename = $slugger->slug($originalFilename);
+                $newFilename = $safeFilename.'-'.uniqid().'.'.$imgFile->guessExtension();
+
+                // Move the file to the directory where brochures are stored
+                try {
+                    $imgFile->move(
+                        $this->getParameter('images_directory'),
+                        $newFilename
+                    );
+                } catch (FileException $e) {
+                    // ... handle exception if something happens during file upload
+                }
+
+                // updates the 'brochureFilename' property to store the PDF file name
+                // instead of its contents
+                $person->setImg($newFilename);
+            }
+
+
+
+            // si oui, on ajoute l'objet person dans la base de données
+            $this->_em->persist($person);
+            $this->_em->flush();
+            // Afficher un message de succès
+            $message = $new ? "La personne a bien été ajouté dans la liste" : "La personne a bien été modifié dans la liste";
+            $this->addFlash('Success', $message);
+            // Rediriger vers la liste des personnes
+            return $this->redirectToRoute('_person.list');
+        } else {
+            return $this->render('person/add.html.twig', [
+                'form' => $form->createView()
+            ]);
+        }
     }
 
 
@@ -63,7 +139,7 @@ class PersonController extends AbstractController
      * @param $nbr
      * @return Response
      */
-    #[Route('/all/{ageMin?22}/{ageMax?33}', name: '_person.age')]
+    #[Route('/all/avg/{ageMin?22}/{ageMax?33}', name: '_person.age')]
     public function displayAllPersonsByAges($ageMin, $ageMax): Response
     {
         $persons = $this->repository->findPersonByIntervalAge($ageMin,$ageMax);
@@ -82,7 +158,7 @@ class PersonController extends AbstractController
      * @param $nbr
      * @return Response
      */
-    #[Route('/all/{page?1}/{nbr?12}', name: '_person.all')]
+    #[Route('/all/avg/{page?1}/{nbr?12}', name: '_person.all')]
     public function displayAllPersons($page, $nbr): Response
     {
         $persons = $this->repository->findBy([], [], $nbr, ($page - 1) * $nbr);

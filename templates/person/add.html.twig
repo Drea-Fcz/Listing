@@ -5,6 +5,18 @@
 {% endblock %}
 
 {% block body %}
-
+    {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+    <div class="row">
+        <div class="col-5">{{ form_row(form.firstname) }}</div>
+        <div class="col-5">{{ form_row(form.name) }}</div>
+        <div class="col-2">{{ form_row(form.age) }}</div>
+    </div>
+    {{ form_rest(form) }}
 {% endblock %}
-
+{% block javascript %}
+    <script>
+        $(document).ready(function () {
+            $('.select2').select2();
+        });
+    </script>
+{% endblock %}
