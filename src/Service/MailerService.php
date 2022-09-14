@@ -11,7 +11,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class MailerService
 {
-    public function __construct(private MailerInterface $mailer )
+    public function __construct(private MailerInterface $mailer, private $replyTo )
     {
     }
 
@@ -28,7 +28,7 @@ class MailerService
             ->to($to)
             //->cc('cc@example.com')
             //->bcc('bcc@example.com')
-            //->replyTo('fabien@example.com')
+            ->replyTo($this->replyTo)
             //->priority(Email::PRIORITY_HIGH)
             ->subject('Time for Symfony Mailer!')
             ->text('Sending emails is fun again!')

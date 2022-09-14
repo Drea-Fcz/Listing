@@ -6,8 +6,10 @@ use App\Entity\Person;
 use App\Form\PersonType;
 use App\Repository\PersonRepository;
 use App\Service\MailerService;
+use App\Service\PdfService;
 use App\Service\UploaderService;
 use Doctrine\ORM\EntityManagerInterface;
+use FontLib\Table\Type\name;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -97,6 +99,12 @@ class PersonController extends AbstractController
             'isStat' => false
         ]);
     }
+
+   /* #[Route('/pdf/{id}', name: 'person.pdf')]
+    public function generatePdf(Person $person = null, PdfService $pdf) {
+        $html = $this->render('person/info.html.twig', [ 'person' => $person]);
+        $pdf->showPdfFile($html);
+    }*/
 
     /**
      * @param $page
