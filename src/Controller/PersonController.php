@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Person;
 use App\Form\PersonType;
 use App\Repository\PersonRepository;
+use App\Service\MailerService;
 use App\Service\UploaderService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -12,6 +13,7 @@ use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
 
@@ -28,38 +30,19 @@ class PersonController extends AbstractController
         $this->_em = $em;
         $this->repository = $repository;
     }
-/*
-    #[Route('/add', name: '_person.add')]
-    public function addPerson(Request $request): Response
-    {
-        $person = new Person();
-        // $person est l'image de notre formulaire
 
-        $personForm = $this->createForm(PersonType::class, $person);
-
-        // récupère l'objet request et extrait les informations saisies
-        $personForm->handleRequest($request);
-
-        // est ce que le formulaire a été soumis
-        if ($personForm->isSubmitted()) {
-            // si oui, on ajoute l'objet person dans la base de données
-            $this->_em->persist($person);
-            $this->_em->flush();
-            // Afficher un message de succès
-            $this->addFlash('Success', "La personne a bien été ajouté dans la liste");
-            // Rediriger vers la liste des personnes
-           return $this->redirectToRoute('_person.list');
-        } else {
-            return $this->render('person/add.html.twig', [
-                'form' => $personForm->createView()
-            ]);
-        }
-    }
-*/
-
+    /**
+     * @throws TransportExceptionInterface
+     */
     #[Route('/edit/{id?0}', name: '_person.edit')]
-    public function editPerson(Person $person = null, Request $request, UploaderService $uploader): Response
+    public function editPerson(Person $person = null,
+                               Request $request,
+                               UploaderService $uploader,
+                               MailerService  $mailerService
+    ): Response
     {
+        $mailerService->sendEmail();
+
         $new = false;
         // $person est l'image de notre formulaire
         if (!$person) {
@@ -85,6 +68,8 @@ class PersonController extends AbstractController
             // si oui, on ajoute l'objet person dans la base de données
             $this->_em->persist($person);
             $this->_em->flush();
+
+
             // Afficher un message de succès
             $message = $new ? "La personne a bien été ajouté dans la liste" : "La personne a bien été modifié dans la liste";
             $this->addFlash('Success', $message);
