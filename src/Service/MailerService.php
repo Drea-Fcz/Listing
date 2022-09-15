@@ -2,7 +2,6 @@
 
 namespace App\Service;
 
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
@@ -11,6 +10,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class MailerService
 {
+    #[Route('/email')]
     public function __construct(private MailerInterface $mailer, private $replyTo )
     {
     }
