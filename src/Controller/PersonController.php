@@ -66,14 +66,15 @@ class PersonController extends AbstractController
                 $directoryFolder = $this->getParameter('images_directory');
                 $person->setImg($uploader->uploadFile($directoryFolder, $imgFile));
             }
-
+            $message = $new ? "La personne a bien été ajouté dans la liste" : "La personne a bien été modifié dans la liste";
+            $person->setCreatedBy($this->getUser());
             // si oui, on ajoute l'objet person dans la base de données
             $this->_em->persist($person);
             $this->_em->flush();
 
 
             // Afficher un message de succès
-            $message = $new ? "La personne a bien été ajouté dans la liste" : "La personne a bien été modifié dans la liste";
+
             $this->addFlash('Success', $message);
             // Rediriger vers la liste des personnes
             return $this->redirectToRoute('_person.list');

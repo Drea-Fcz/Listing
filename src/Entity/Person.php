@@ -49,6 +49,9 @@ class Person
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $img = null;
 
+    #[ORM\ManyToOne(inversedBy: 'people')]
+    private ?User $createdBy = null;
+
 
 
     public function __construct()
@@ -172,6 +175,18 @@ class Person
     public function setImg(?string $img): self
     {
         $this->img = $img;
+
+        return $this;
+    }
+
+    public function getCreatedBy(): ?User
+    {
+        return $this->createdBy;
+    }
+
+    public function setCreatedBy(?User $createdBy): self
+    {
+        $this->createdBy = $createdBy;
 
         return $this;
     }

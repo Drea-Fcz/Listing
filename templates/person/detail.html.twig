@@ -10,6 +10,11 @@
                     <p class="card-text">
                         {{ person.firstname }} is {{ person.age }} years old
                     </p>
+                    {% if person.createdBy %}
+                        <p>
+                            Created By : {{ person.createdBy.email }}
+                        </p>
+                    {% endif %}
                     <div class="d-flex flex-column">
                         <span class="text-muted small">Created at {{ person.createdAt | date("d/m/Y")  }}</span>
                         <span class="text-muted small">Updated at {{ person.updatedAt | date("d/m/Y") }} </span>
