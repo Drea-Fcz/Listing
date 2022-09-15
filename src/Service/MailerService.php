@@ -19,7 +19,7 @@ class MailerService
      * @throws TransportExceptionInterface
      */
     public function sendEmail(
-        $to = 'otw67965@nezid.com',
+        $to = 'fcz.audre@gmail.com',
         $content = '<p>See Twig integration for better HTML integration!</p>'
     ): void
     {
