@@ -3,22 +3,22 @@
 namespace App\Controller;
 
 use App\Entity\Person;
+use App\Event\AddPersonEvent;
+use App\Event\ListAllPersonEvent;
 use App\Form\PersonType;
 use App\Repository\PersonRepository;
 use App\Service\MailerService;
-use App\Service\PdfService;
 use App\Service\UploaderService;
 use Doctrine\ORM\EntityManagerInterface;
-use FontLib\Table\Type\name;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\String\Slugger\SluggerInterface;
 
 #[
     Route('person'),
@@ -26,15 +26,13 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 ]
 class PersonController extends AbstractController
 {
-    private EntityManagerInterface $_em;
-    private PersonRepository $repository;
 
-    public function __construct(EntityManagerInterface $em,
-                                PersonRepository $repository,
+    public function __construct(
+        private EntityManagerInterface $_em,
+        private PersonRepository $repository,
+        private EventDispatcherInterface $dispatcher
     )
     {
-        $this->_em = $em;
-        $this->repository = $repository;
     }
 
     /**
@@ -75,12 +73,18 @@ class PersonController extends AbstractController
             }
             $message = $new ? "La personne a bien été ajouté dans la liste" : "La personne a bien été modifié dans la liste";
             $person->setCreatedBy($this->getUser());
+
             // si oui, on ajoute l'objet person dans la base de données
             $this->_em->persist($person);
             $this->_em->flush();
-            $mailerService->sendEmail();
 
-            // Afficher un message de succès
+            // Event Listener
+            if ($new) {
+                // create new event with AddPersonEvent
+                $addPersonEvent = new AddPersonEvent($person);
+                // We need to dispatch the event
+                $this->dispatcher->dispatch($addPersonEvent, AddPersonEvent::ADD_PERSON_EVENT);
+            }
 
             $this->addFlash('Success', $message);
             // Rediriger vers la liste des personnes
@@ -124,7 +128,8 @@ class PersonController extends AbstractController
     {
         $persons = $this->repository->findPersonByIntervalAge($ageMin,$ageMax);
         $stats = $this->repository->statPersonByIntervalAgeAndMoyen($ageMin,$ageMax);
-
+        $listAllPersonEvent = new ListAllPersonEvent(count($persons));
+        $this->dispatcher->dispatch($listAllPersonEvent, ListAllPersonEvent::LIST_ALL_PERSON_EVENT);
         return $this->render('person/detail.html.twig', [
             'persons' => $persons,
             'stat' => $stats,
