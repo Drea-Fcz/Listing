@@ -10,6 +10,7 @@ use App\Service\PdfService;
 use App\Service\UploaderService;
 use Doctrine\ORM\EntityManagerInterface;
 use FontLib\Table\Type\name;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -19,7 +20,10 @@ use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
 
-#[Route('person')]
+#[
+    Route('person'),
+    isGranted('ROLE_USER')
+]
 class PersonController extends AbstractController
 {
     private EntityManagerInterface $_em;
@@ -36,14 +40,17 @@ class PersonController extends AbstractController
     /**
      * @throws TransportExceptionInterface
      */
-    #[Route('/edit/{id?0}', name: '_person.edit')]
+    #[
+        Route('/edit/{id?0}', name: '_person.edit'),
+        isGranted('ROLE_ADMIN')
+    ]
     public function editPerson(Person $person = null,
                                Request $request,
                                UploaderService $uploader,
                                MailerService  $mailerService
     ): Response
     {
-        $mailerService->sendEmail();
+
 
         $new = false;
         // $person est l'image de notre formulaire
@@ -71,7 +78,7 @@ class PersonController extends AbstractController
             // si oui, on ajoute l'objet person dans la base de données
             $this->_em->persist($person);
             $this->_em->flush();
-
+            $mailerService->sendEmail();
 
             // Afficher un message de succès
 

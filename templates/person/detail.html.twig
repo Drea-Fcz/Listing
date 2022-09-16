@@ -16,18 +16,22 @@
                         </p>
                     {% endif %}
                     <div class="d-flex flex-column">
-                        <span class="text-muted small">Created at {{ person.createdAt | date("d/m/Y")  }}</span>
+                        <span class="text-muted small">Created at {{ person.createdAt | date("d/m/Y") }}</span>
                         <span class="text-muted small">Updated at {{ person.updatedAt | date("d/m/Y") }} </span>
                     </div>
-                    <a href="#" class="card-link">
-                        <i class="fa-light fa-info-circle text-black"></i>
-                    </a>
-                    <a href="{{ path('_person.delete', {id: person.id}) }}" class="card-link">
-                        <i class="fa-solid fa-user-xmark text-black"></i>
-                    </a>
-                    <a href="{{ path('_person.edit', {id: person.id}) }}" class="card-link">
-                        <i class="fa-solid fa-user-pen text-black"></i>
-                    </a>
+                    {% if is_granted('ROLE_ADMIN') %}
+                    <span>
+                        <a href="#" class="card-link">
+                            <i class="fa-light fa-info-circle text-black"></i>
+                        </a>
+                        <a href="{{ path('_person.delete', {id: person.id}) }}" class="card-link">
+                            <i class="fa-solid fa-user-xmark text-black"></i>
+                        </a>
+                        <a href="{{ path('_person.edit', {id: person.id}) }}" class="card-link">
+                            <i class="fa-solid fa-user-pen text-black"></i>
+                        </a>
+                    </span>
+                    {% endif %}
                 </div>
             </div>
         {% endfor %}
@@ -57,23 +61,23 @@
     {% endif %}
 
     {% if isStat %}
-    <div class="container">
-        <div class="row">
-            <div class="col-xl-3 col-md-6">
-                <div class="card bg-primary text-white mb-4">
-                    <div class="card-body">Moyenne d'age : {{ stat[0].ageMoyen }}
-                        <p>
-                            <span class="small">il y a {{ stat[0].nbrPerson }}</span>
-                        </p>
-                    </div>
-                    <div class="card-footer d-flex align-items-center justify-content-between">
-                        <a class="small text-white stretched-link" href="#">View Details</a>
-                        <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+        <div class="container">
+            <div class="row">
+                <div class="col-xl-3 col-md-6">
+                    <div class="card bg-primary text-white mb-4">
+                        <div class="card-body">Moyenne d'age : {{ stat[0].ageMoyen }}
+                            <p>
+                                <span class="small">il y a {{ stat[0].nbrPerson }}</span>
+                            </p>
+                        </div>
+                        <div class="card-footer d-flex align-items-center justify-content-between">
+                            <a class="small text-white stretched-link" href="#">View Details</a>
+                            <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
     {% endif %}
 {% endblock %}
 
